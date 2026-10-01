@@ -6,7 +6,6 @@ import com.example.afisha.entity.Event;
 import com.example.afisha.repository.EventRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

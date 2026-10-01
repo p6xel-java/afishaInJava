@@ -1,7 +1,6 @@
 package com.example.afisha.controller;
 
 import com.example.afisha.dto.EventResponseDto;
-import com.example.afisha.repository.EventRepository;
 import com.example.afisha.service.EventService;
 import org.springframework.web.bind.annotation.*;
 
