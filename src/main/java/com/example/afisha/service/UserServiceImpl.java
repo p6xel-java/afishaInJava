@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +58,13 @@ public class UserServiceImpl implements UserService {
         String token = jwtUtils.generateToken(loginDto.getEmail());
 
         return new JwtResponseDto(token);
+    }
+
+    @Override
+    public UserResponseDto getCurrentUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+        return mapToUserResponseDto(user);
     }
 
     private UserResponseDto mapToUserResponseDto(User user) {

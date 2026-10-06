@@ -11,5 +11,7 @@ public interface UserService {
 
     JwtResponseDto login(LoginRequestDto loginDto);
 
+    UserResponseDto getCurrentUser(String email);
+
 
 }
