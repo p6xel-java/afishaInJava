@@ -1,24 +1,23 @@
 package com.example.afisha.service;
 
+import com.example.afisha.dto.EventRequestDto;
 import com.example.afisha.dto.EventResponseDto;
 import com.example.afisha.dto.KudaGoEventDto;
 import com.example.afisha.entity.Event;
 import com.example.afisha.repository.EventRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
 
     private final EventFetcherService eventFetcherService;
 
-    public EventServiceImpl(EventRepository eventRepository, EventFetcherService eventFetcherService) {
-        this.eventRepository = eventRepository;
-        this.eventFetcherService = eventFetcherService;
-    }
 
     @Override
     public void syncEvents() {
@@ -49,6 +48,20 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Событие с " + id + " не найдено"));
         return mapToResponseDto(event);
+    }
+
+    @Override
+    public EventResponseDto createEvent(EventRequestDto requestDto) {
+        Event event = new Event();
+        event.setTitle(requestDto.getTitle());
+        event.setDescription(requestDto.getDescription());
+        event.setVenue(requestDto.getVenue());
+        event.setPrice(requestDto.getPrice());
+        event.setStartDateTime(requestDto.getStartDateTime());
+
+        Event savedEvent = eventRepository.save(event);
+        return mapToResponseDto(savedEvent);
+
     }
 
     private EventResponseDto mapToResponseDto(Event event) {

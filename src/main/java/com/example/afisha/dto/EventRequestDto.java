@@ -1,5 +1,6 @@
 package com.example.afisha.dto;
 
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,11 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EventResponseDto {
-
-    private Long id;
-
-    private String externalId;
+public class EventRequestDto {
 
     private String title;
 
@@ -25,5 +22,4 @@ public class EventResponseDto {
     private BigDecimal price;
 
     private LocalDateTime startDateTime;
-
 }
