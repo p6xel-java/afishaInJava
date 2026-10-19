@@ -1,8 +1,8 @@
 package com.example.afisha.service;
 
 
-import com.example.afisha.dto.KudaGoEventDto;
-import com.example.afisha.dto.KudaGoResponceDto;
+import com.example.afisha.dto.kudago.KudaGoEventDto;
+import com.example.afisha.dto.kudago.KudaGoResponceDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 

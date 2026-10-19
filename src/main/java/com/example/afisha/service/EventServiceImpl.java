@@ -2,7 +2,7 @@ package com.example.afisha.service;
 
 import com.example.afisha.dto.EventRequestDto;
 import com.example.afisha.dto.EventResponseDto;
-import com.example.afisha.dto.KudaGoEventDto;
+import com.example.afisha.dto.kudago.KudaGoEventDto;
 import com.example.afisha.entity.Event;
 import com.example.afisha.repository.EventRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,15 +1,17 @@
-package com.example.afisha.dto;
+package com.example.afisha.dto.kudago;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class KudaGoResponceDto {
+
+    private Integer count;
+
+    private String next;
 
     private List<KudaGoEventDto> results;
 
