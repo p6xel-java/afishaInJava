@@ -13,6 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -24,89 +27,121 @@ import static org.mockito.Mockito.*;
 class KudaGoServiceImplTest {
 
     @Mock
-    private RestClient kudaGoRestClient;
+    private RestClient restClient;
 
     @Mock
-    private EventRepository eventRepository;
+    private EventRepository repository;
 
     @Mock
-    private RestClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    private RestClient.RequestHeadersUriSpec requestUri;
 
     @Mock
-    private RestClient.RequestHeadersSpec requestHeadersSpec;
+    private RestClient.RequestHeadersSpec requestHeaders;
 
     @Mock
     private RestClient.ResponseSpec responseSpec;
 
     @InjectMocks
-    private KudaGoServiceImpl kudaGoService;
+    private KudaGoServiceImpl service;
 
-
-
-    @Test
-    void successImportEventsTest() {
-
-        KudaGoEventDto eventDto = new KudaGoEventDto();
-        eventDto.setId(123L);
-        eventDto.setTitle("Концерт Kanye West");
-        eventDto.setDescription("Супер концерт, которого никогда не будет");
-        eventDto.setPrice("100000");
-
-        KudaGoResponceDto responceDto = new KudaGoResponceDto();
-        responceDto.setCount(1);
-        responceDto.setResults(List.of(eventDto));
-
-        when(kudaGoRestClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(KudaGoResponceDto.class)).thenReturn(responceDto);
-
-        when(eventRepository.findByExternalId("123")).thenReturn(Optional.empty());
-        int result = kudaGoService.importEventsFromKudaGo("spb",1);
-        assertEquals(1, result);
-
-
-        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
-        verify(eventRepository, times(1)).save(eventCaptor.capture());
-
-        Event savedEvent = eventCaptor.getValue();
-        assertEquals(eventDto.getId().toString(), savedEvent.getExternalId());
-        assertEquals(eventDto.getTitle(), savedEvent.getTitle());
-        assertEquals(eventDto.getDescription(), savedEvent.getDescription());
-        assertEquals(eventDto.getPrice(), savedEvent.getPrice().toString());
+    private void stubGetRequest(KudaGoResponceDto... responses) {
+        when(restClient.get()).thenReturn(requestUri);
+        when(requestUri.uri(any(Function.class))).thenReturn(requestHeaders);
+        when(requestHeaders.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.body(KudaGoResponceDto.class)).thenReturn(responses[0], java.util.Arrays.copyOfRange(responses, 1, responses.length));
     }
 
     @Test
-    void importEventAndUpdateExistingEventTest() {
-        KudaGoEventDto eventDto = new KudaGoEventDto();
-        eventDto.setId(999L);
-        eventDto.setTitle("Обновленное название");
-        eventDto.setDescription("Обновленное описание");
-        eventDto.setPrice("0");
+    void importsNewEventAndParsesSimplePriceAndStartDate() {
+        KudaGoEventDto dto = externalEvent(123L, "Concert", "100000");
+        KudaGoEventDto.DateTime date = new KudaGoEventDto.DateTime();
+        date.setStart(1_700_000_000L);
+        dto.setDates(List.of(date));
+        stubGetRequest(response(List.of(dto)));
+        when(repository.findByExternalId("123")).thenReturn(Optional.empty());
 
-        KudaGoResponceDto responceDto = new KudaGoResponceDto();
-        responceDto.setResults(List.of(eventDto));
+        int imported = service.importEventsFromKudaGo("spb", 1);
 
-        when(kudaGoRestClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(KudaGoResponceDto.class)).thenReturn(responceDto);
+        assertEquals(1, imported);
+        ArgumentCaptor<Event> captor = ArgumentCaptor.forClass(Event.class);
+        verify(repository).save(captor.capture());
+        Event event = captor.getValue();
+        assertEquals("123", event.getExternalId());
+        assertEquals("Concert", event.getTitle());
+        assertEquals("Description", event.getDescription());
+        assertEquals("KudaGo Event", event.getVenue());
+        assertEquals(new BigDecimal("100000"), event.getPrice());
+        assertEquals(LocalDateTime.ofInstant(Instant.ofEpochSecond(1_700_000_000L),
+                ZoneId.systemDefault()), event.getStartDateTime());
+    }
 
-        Event existingEvent = new Event();
-        existingEvent.setId(10L);
-        existingEvent.setExternalId("999");
-        when(eventRepository.findByExternalId("999")).thenReturn(Optional.of(existingEvent));
+    @Test
+    void updatesExistingEventPreservingInternalId() {
+        KudaGoEventDto dto = externalEvent(999L, "Updated", "Бесплатно");
+        stubGetRequest(response(List.of(dto)));
+        Event existing = new Event();
+        existing.setId(10L);
+        existing.setExternalId("999");
+        when(repository.findByExternalId("999")).thenReturn(Optional.of(existing));
 
-        int importedCount = kudaGoService.importEventsFromKudaGo("spb", 1);
+        assertEquals(1, service.importEventsFromKudaGo("spb", 1));
+        ArgumentCaptor<Event> captor = ArgumentCaptor.forClass(Event.class);
+        verify(repository).save(captor.capture());
+        assertSame(existing, captor.getValue());
+        assertEquals(10L, existing.getId());
+        assertEquals("Updated", existing.getTitle());
+        assertEquals(BigDecimal.ZERO, existing.getPrice());
+    }
 
-        assertEquals(1, importedCount);
+    @Test
+    void importsAcrossTwoPages() {
+        stubGetRequest(response(List.of(externalEvent(1L, "A", "150"))),
+                response(List.of(externalEvent(2L, "B", "250"))));
+        when(repository.findByExternalId(anyString())).thenReturn(Optional.empty());
 
-        ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
-        verify(eventRepository, times(1)).save(eventCaptor.capture());
+        assertEquals(2, service.importEventsFromKudaGo("spb", 2));
+        verify(repository, times(2)).save(any(Event.class));
+        verify(restClient, times(2)).get();
+    }
 
-        Event savedEvent = eventCaptor.getValue();
-        assertEquals(10L, savedEvent.getId());
-        assertEquals(BigDecimal.ZERO, savedEvent.getPrice());
+    @Test
+    void nullResponseStopsImport() {
+        when(restClient.get()).thenReturn(requestUri);
+        when(requestUri.uri(any(Function.class))).thenReturn(requestHeaders);
+        when(requestHeaders.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.body(KudaGoResponceDto.class)).thenReturn(null);
+
+        assertEquals(0, service.importEventsFromKudaGo("spb", 3));
+        verify(restClient).get();
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void nullResultsStopsImport() {
+        stubGetRequest(response(null));
+        assertEquals(0, service.importEventsFromKudaGo("spb", 2));
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void zeroPageCountDoesNotRequestExternalApi() {
+        assertEquals(0, service.importEventsFromKudaGo("spb", 0));
+        verifyNoInteractions(restClient, repository);
+    }
+
+    private static KudaGoEventDto externalEvent(long id, String title, String price) {
+        KudaGoEventDto dto = new KudaGoEventDto();
+        dto.setId(id);
+        dto.setTitle(title);
+        dto.setDescription("Description");
+        dto.setPrice(price);
+        return dto;
+    }
+
+    private static KudaGoResponceDto response(List<KudaGoEventDto> results) {
+        KudaGoResponceDto response = new KudaGoResponceDto();
+        response.setResults(results);
+        return response;
     }
 
 }

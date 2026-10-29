@@ -47,7 +47,7 @@ public class EventController {
     @PostMapping("/import")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> importEvents(
-            @RequestParam(defaultValue = "msk") String location,
+            @RequestParam(defaultValue = "spb") String location,
             @RequestParam(defaultValue = "1") int pages) {
         int count = kudaGoService.importEventsFromKudaGo(location, pages);
         return ResponseEntity.ok(Map.of(
