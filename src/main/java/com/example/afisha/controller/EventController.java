@@ -4,6 +4,10 @@ import com.example.afisha.dto.EventRequestDto;
 import com.example.afisha.dto.EventResponseDto;
 import com.example.afisha.service.EventService;
 import com.example.afisha.service.KudaGoService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,21 +38,21 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public EventResponseDto getEventById(@PathVariable Long id) {
+    public EventResponseDto getEventById(@PathVariable @Min(value = 1, message = "ID должно быть положительным") Long id) {
         return eventService.getEventById(id);
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public EventResponseDto createEvent(@RequestBody EventRequestDto requestDto) {
+    public EventResponseDto createEvent(@RequestBody @Valid EventRequestDto requestDto) {
         return eventService.createEvent(requestDto);
     }
 
     @PostMapping("/import")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> importEvents(
-            @RequestParam(defaultValue = "spb") String location,
-            @RequestParam(defaultValue = "1") int pages) {
+            @RequestParam(defaultValue = "spb") @NotBlank String location,
+            @RequestParam(defaultValue = "1") @Min(1) @Max(100) int pages) {
         int count = kudaGoService.importEventsFromKudaGo(location, pages);
         return ResponseEntity.ok(Map.of(
                 "message", "Импорт из KudeGo завершен успешно", "importedCount", count

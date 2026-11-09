@@ -5,6 +5,7 @@ import com.example.afisha.dto.LoginRequestDto;
 import com.example.afisha.dto.RegisterRequestDto;
 import com.example.afisha.dto.UserResponseDto;
 import com.example.afisha.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,12 +20,12 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public UserResponseDto register(@RequestBody RegisterRequestDto registerDto) {
+    public UserResponseDto register(@RequestBody  @Valid RegisterRequestDto registerDto) {
         return userService.register(registerDto);
     }
 
     @PostMapping("/login")
-    public JwtResponseDto login(@RequestBody LoginRequestDto loginDto) {
+    public JwtResponseDto login(@RequestBody @Valid LoginRequestDto loginDto) {
         return userService.login(loginDto);
     }
 

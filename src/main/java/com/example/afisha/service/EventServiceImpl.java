@@ -4,6 +4,7 @@ import com.example.afisha.dto.EventRequestDto;
 import com.example.afisha.dto.EventResponseDto;
 import com.example.afisha.dto.kudago.KudaGoEventDto;
 import com.example.afisha.entity.Event;
+import com.example.afisha.exception.EventNotFoundException;
 import com.example.afisha.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventResponseDto getEventById(Long id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Событие с " + id + " не найдено"));
+                .orElseThrow(() -> new EventNotFoundException("Событие с " + id + " не найдено"));
         return mapToResponseDto(event);
     }
 
