@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Оплата мероприятия</title>
+</head>
+<body>
+<h2>Оплата билета</h2>
+
+<button id="payButton">Перейти к оплате</button>
+
+<script>
+    document.getElementById("payButton")
+        .addEventListener("click", async () => {
+
+            const eventId = Number(
+                new URLSearchParams(location.search).get("eventId")
+            );
+
+            const token = sessionStorage.getItem("accessToken");
+
+            const response = await fetch(
+                "/api/v1/payments/intent",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    },
+                    body: JSON.stringify({ eventId })
+                }
+            );
+
+            if (!response.ok) {
+                alert("Не удалось создать платеж");
+                return;
+            }
+
+            const payment = await response.json();
+
+            window.location.assign(payment.confirmationUrl);
+        });
+</script>
+</body>
+</html>

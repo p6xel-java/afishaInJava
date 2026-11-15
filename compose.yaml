@@ -1,26 +1,35 @@
 services:
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: afisha-mailpit
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8025:8025"
+      - "127.0.0.1:1025:1025"
+
   db:
     image: postgres:16
     container_name: afisha-db
 
     environment:
       POSTGRES_DB: afisha_db
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "127.0.0.1:5432:5432"
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d afisha_db"]
       interval: 5s
       timeout: 5s
       retries: 10
-      start_period: 10s
 
     restart: unless-stopped
-
 
   app:
     build: .
@@ -31,16 +40,22 @@ services:
 
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/afisha_db
-      SPRING_DATASOURCE_USERNAME: ${DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: 1025
+      SMTP_AUTH: "false"
+      SMTP_STARTTLS: "false"
       JWT_SECRET: ${JWT_SECRET}
+
+      YOOKASSA_SHOP_ID: ${YOOKASSA_SHOP_ID}
+      YOOKASSA_SECRET_KEY: ${YOOKASSA_SECRET_KEY}
 
     depends_on:
       db:
         condition: service_healthy
 
     restart: unless-stopped
-
 
 volumes:
   postgres_data:

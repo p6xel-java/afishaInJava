@@ -38,7 +38,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public EventResponseDto getEventById(@PathVariable @Min(value = 1, message = "ID должно быть положительным") Long id) {
+    public EventResponseDto getEventById(@PathVariable("id") @Min(1) Long id) {
         return eventService.getEventById(id);
     }
 

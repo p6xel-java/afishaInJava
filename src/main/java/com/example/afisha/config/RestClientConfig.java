@@ -13,4 +13,9 @@ public class RestClientConfig {
                 .baseUrl("https://kudago.com/public-api/v1.4")
                 .build();
     }
+
+    @Bean
+    public RestClient.Builder restClientBuilder() {
+        return RestClient.builder();
+    }
 }
