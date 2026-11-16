@@ -1,4 +1,4 @@
-package com.example.afisha.dto;
+package com.example.afisha.entity;
 
 public enum TicketStatus {
     PENDING,

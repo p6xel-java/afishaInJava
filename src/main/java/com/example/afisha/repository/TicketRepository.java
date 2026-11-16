@@ -1,6 +1,6 @@
 package com.example.afisha.repository;
 
-import com.example.afisha.dto.Ticket;
+import com.example.afisha.entity.Ticket;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

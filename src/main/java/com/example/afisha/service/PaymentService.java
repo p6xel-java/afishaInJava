@@ -1,8 +1,8 @@
 package com.example.afisha.service;
 
 import com.example.afisha.dto.PaymentInitResponse;
-import com.example.afisha.dto.Ticket;
-import com.example.afisha.dto.TicketStatus;
+import com.example.afisha.entity.Ticket;
+import com.example.afisha.entity.TicketStatus;
 import com.example.afisha.entity.Event;
 import com.example.afisha.entity.User;
 import com.example.afisha.repository.EventRepository;

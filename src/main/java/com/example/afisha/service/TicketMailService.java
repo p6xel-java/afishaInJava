@@ -1,8 +1,7 @@
 package com.example.afisha.service;
 
-import com.example.afisha.dto.Ticket;
+import com.example.afisha.entity.Ticket;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.util.ByteArrayDataSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
