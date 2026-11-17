@@ -64,6 +64,11 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/css/**",
+                                "/js/**",
+                                "/favicon.ico",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"

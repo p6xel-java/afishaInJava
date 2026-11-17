@@ -3,6 +3,7 @@ package com.example.afisha.service;
 
 import com.example.afisha.dto.kudago.KudaGoEventDto;
 import com.example.afisha.dto.kudago.KudaGoResponceDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -12,7 +13,8 @@ import java.util.List;
 @Service
 public class KudaGoEventFetcherServiceImpl implements EventFetcherService{
 
-    private static final String KUDAGO_API_URL = "https://kudago.com/public-api/v1.4/events/?location=spb&fields=id,title,description";
+    @Value("${kudago.api.url}")
+    private String KUDAGO_API_URL;
 
     private final RestTemplate restTemplate;
 

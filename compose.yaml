@@ -1,3 +1,4 @@
+
 services:
 
   mailpit:
@@ -56,6 +57,26 @@ services:
         condition: service_healthy
 
     restart: unless-stopped
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: afisha-ngrok
+    restart: unless-stopped
+
+    command:
+      - "http"
+      - "app:8080"
+      - "--url=${NGROK_DOMAIN}"
+
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+      NGROK_WEB_ADDR: "0.0.0.0:4040"
+
+    ports:
+      - "127.0.0.1:4041:4040"
+
+    depends_on:
+      - app
 
 volumes:
   postgres_data:
