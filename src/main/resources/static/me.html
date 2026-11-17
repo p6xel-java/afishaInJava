@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101522">
+    <title>Личный кабинет — Афиша</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/me.css">
+    <script src="/js/me.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+    <div class="shell nav">
+        <a class="brand" href="/"><span class="brand-icon">✳</span> афиша<span class="brand-dot">.</span></a>
+        <nav class="profile-nav"><a href="/#events">События</a><a href="/me" aria-current="page">Личный кабинет</a></nav>
+        <div class="nav-right"><a class="btn btn-outline" href="/">← На главную</a><button class="btn btn-ghost" id="logoutBtn" type="button">Выйти</button></div>
+    </div>
+</header>
+<main>
+    <section class="account-hero">
+        <div class="shell account-hero-inner">
+            <div><div class="account-eyebrow">✦ ТВОЯ АФИША</div><h1>Личный <em>кабинет.</em></h1><p>Все важное об аккаунте в одном месте.</p></div>
+            <div class="account-orb" aria-hidden="true">✳</div>
+        </div>
+    </section>
+    <section class="shell account-layout" id="accountRoot">
+        <aside class="account-sidebar">
+            <div class="side-profile"><div class="avatar" id="sideAvatar">✳</div><strong id="sideName">Загрузка…</strong><span id="sideEmail">Проверяем аккаунт</span></div>
+            <div class="side-label">МЕНЮ</div>
+            <button class="side-link active" data-tab="profile" type="button"><span>◉</span> Мой профиль</button>
+            <button class="side-link" data-tab="admin" id="adminTab" type="button" hidden><span>✦</span> Админ-панель</button>
+            <a href="/#events" class="side-link"><span>▤</span> Каталог событий</a>
+            <div class="sidebar-foot"><span class="online-dot"></span> Аккаунт активен</div>
+        </aside>
+        <div class="account-main">
+            <div id="loadingCard" class="state-card" role="status">Загружаем данные профиля…</div>
+            <div id="errorCard" class="state-card" hidden><h2>Не удалось загрузить профиль</h2><p id="errorText"></p><button id="retryBtn" class="btn btn-accent" type="button">Повторить</button><a href="/" class="btn btn-outline">На главную</a></div>
+            <section id="profileSection" hidden aria-labelledby="profileTitle">
+                <div class="section-heading"><div><div class="eyebrow text-violet">ОБ УЧЕТНОЙ ЗАПИСИ</div><h2 id="profileTitle">Мой профиль<span class="period">.</span></h2><p>Персональная информация твоего аккаунта.</p></div><span class="secure-label">✓ Авторизован</span></div>
+                <div class="identity-card"><div class="identity-avatar" id="profileAvatar">A</div><div class="identity-main"><div class="identity-overline">ДОБРО ПОЖАЛОВАТЬ</div><h3 id="fullName">—</h3><p id="primaryEmail">—</p></div><span id="rolePill" class="role-pill">Пользователь</span></div>
+                <div class="info-card"><div class="card-heading"><h3>Личные данные</h3><span>◈</span></div><div class="info-grid"><div class="info-cell"><span>Имя</span><strong id="firstName">—</strong></div><div class="info-cell"><span>Фамилия</span><strong id="lastName">—</strong></div><div class="info-cell"><span>Email</span><strong id="email">—</strong></div><div class="info-cell"><span>Роль</span><strong id="role">—</strong></div><div class="info-cell"><span>ID аккаунта</span><strong id="userId">—</strong></div><div class="info-cell"><span>Статус</span><strong class="active-text">● Активен</strong></div></div></div>
+                <div class="profile-actions"><a class="btn btn-accent" href="/#events">Выбрать событие ↗</a><button class="btn btn-outline" id="adminShortcut" type="button" hidden>Управлять мероприятиями ↗</button></div>
+            </section>
+            <section id="adminSection" hidden aria-labelledby="adminTitle">
+                <div class="section-heading"><div><div class="eyebrow text-violet">ПАНЕЛЬ УПРАВЛЕНИЯ</div><h2 id="adminTitle">Новое событие<span class="period">.</span></h2><p>Создай мероприятие, которое увидят посетители афиши.</p></div><span class="admin-label">✦ ADMIN</span></div>
+                <div class="info-card form-card"><div class="card-heading"><h3>Информация о мероприятии</h3><span>✳</span></div>
+                    <form id="createEventForm" class="event-form">
+                        <label>Название мероприятия <span>*</span><input name="title" type="text" maxlength="255" placeholder="Например, Музыкальный фестиваль" required></label>
+                        <label>Описание<textarea name="description" rows="5" placeholder="Расскажи, почему это событие нельзя пропустить…"></textarea></label>
+                        <label>Место проведения <span>*</span><input name="venue" type="text" maxlength="255" placeholder="Например, Газпром Арена" required></label>
+                        <div class="form-two"><label>Стоимость, ₽ <span>*</span><input name="price" type="number" min="0" step="0.01" placeholder="1500.00" required></label><label>Дата и время <span>*</span><input name="startDateTime" type="datetime-local" required></label></div>
+                        <p class="form-hint">* Обязательные поля. Дату указывай в локальном времени сервера.</p>
+                        <div id="formError" class="form-alert error-alert" role="alert" hidden></div>
+                        <div id="formSuccess" class="form-alert success-alert" role="status" hidden></div>
+                        <div class="form-bottom"><span>Мероприятие появится в общем каталоге</span><button id="createSubmit" class="btn btn-accent btn-big" type="submit">Опубликовать событие ↗</button></div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </section>
+</main>
+<footer><div class="shell footer-inner"><span class="brand">✳ афиша<span class="brand-dot">.</span></span><span>Твой город · Твоя афиша</span><span>© 2026</span></div></footer>
+</body>
+</html>

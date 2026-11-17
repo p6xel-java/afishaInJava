@@ -106,7 +106,7 @@ docker compose logs -f app
 | ngrok inspector | http://localhost:4041 |
 | PostgreSQL (на хосте) | `localhost:5432` |
 
-Mailpit принимает письма локально и **не отправляет** их на реальные почтовые ящики. 
+Mailpit принимает письма локально и **не отправляет** их на реальные почтовые ящики.
 
 Остановить приложение:
 
@@ -278,4 +278,3 @@ Windows:
 ##  Автор
 
 Разработка: [p6xel-java](https://github.com/p6xel-java)
-

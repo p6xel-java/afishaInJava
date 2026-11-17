@@ -58,14 +58,16 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-
                         .dispatcherTypeMatchers(
-                                DispatcherType.ERROR
+                                DispatcherType.ERROR,
+                                DispatcherType.FORWARD
                         ).permitAll()
 
                         .requestMatchers(
                                 "/",
                                 "/index.html",
+                                "/me",
+                                "/me.html",
                                 "/css/**",
                                 "/js/**",
                                 "/favicon.ico",
@@ -74,9 +76,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        .requestMatchers(
-                                "/api/v1/auth/**"
-                        ).permitAll()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
 
                         .requestMatchers(
                                 HttpMethod.GET,
